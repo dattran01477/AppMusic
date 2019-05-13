@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/nav_home"
+        android:icon="@drawable/ic_home"
+        android:title="@string/nav_home" />
+
+    <item
+        android:id="@+id/nav_song"
+        android:icon="@drawable/ic_song"
+        android:title="@string/nav_song" />
+    <item
+        android:id="@+id/nav_playlist"
+        android:icon="@drawable/ic_list"
+        android:title="@string/nav_playlist" />
+    <item
+        android:id="@+id/nav_album"
+        android:icon="@drawable/ic_album"
+        android:title="@string/nav_album" />
+</menu>

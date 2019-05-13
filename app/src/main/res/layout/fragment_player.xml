@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/parent_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context=".view.MainActivity">
+
+
+    <!-- <com.jgabrielfreitas.core.BlurImageView
+         android:layout_width="match_parent"
+         android:layout_height="match_parent"
+         android:scaleType="fitXY"
+         android:id="@+id/background_blur"
+         android:src="@drawable/background" />-->
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="200dp" />
+
+        <LinearLayout
+            android:id="@+id/player_control"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/black"
+            android:orientation="vertical"
+            android:padding="15dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageButton xmlns:app="http://schemas.android.com/apk/res-auto"
+                    android:id="@+id/btn_repeat"
+                    android:layout_width="?attr/actionBarSize"
+                    android:layout_height="?attr/actionBarSize"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+
+                    app:srcCompat="@drawable/ic_repeat"
+                    android:tint="@android:color/white"
+                    tools:srcCompat="@drawable/ic_repeat"
+                    tools:ignore="VectorDrawableCompat" />
+
+                <android.support.v7.widget.AppCompatSeekBar
+                    android:id="@+id/seek_aong_progessbar"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:progress="0"
+                    android:progressDrawable="@drawable/ic_seekbarthumb" />
+
+                <ImageButton
+                    android:id="@+id/btn_suffle"
+                    android:layout_width="?attr/actionBarSize"
+                    android:layout_height="?attr/actionBarSize"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+
+                    app:srcCompat="@drawable/ic_shuffle"
+                    android:tint="@android:color/white"
+                    tools:srcCompat="@drawable/ic_shuffle"
+                    tools:ignore="VectorDrawableCompat" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:padding="15dp">
+
+                <TextView
+                    android:id="@+id/tv_song_current_duration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="15dp"
+                    android:text="0:00"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                    android:textColor="@android:color/white" />
+
+                <ImageButton
+                    android:id="@+id/btn_prev"
+                    android:layout_width="0dp"
+                    android:layout_height="?attr/actionBarSize"
+                    android:layout_weight="1"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+
+                    android:tint="@color/colorDarkDrange"
+                    app:srcCompat="@drawable/ic_skipprev"
+                    tools:ignore="VectorDrawableCompat" />
+
+                <android.support.design.widget.FloatingActionButton
+                    android:id="@+id/btn_play"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:backgroundTint="@color/colorDarkDrange"
+                    android:clickable="true"
+                    android:tint="@android:color/white"
+                    app:elevation="2dp"
+
+                    app:fabSize="normal"
+                    app:rippleColor="@android:color/white"
+                    app:srcCompat="@drawable/ic_pause"
+                    tools:ignore="VectorDrawableCompat"></android.support.design.widget.FloatingActionButton>
+
+                <ImageButton
+                    android:id="@+id/btn_skip"
+                    android:layout_width="0dp"
+                    android:layout_height="?attr/actionBarSize"
+                    android:layout_weight="1"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+
+                    android:tint="@color/colorDarkDrange"
+                    app:srcCompat="@drawable/ic_skip"
+                    tools:ignore="VectorDrawableCompat" />
+
+                <TextView
+                    android:id="@+id/total_duration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="15dp"
+                    android:text="3:00"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                    android:textColor="@android:color/white" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="56dp"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp">
+
+            <!--  <com.mikhaellopez.circularimageview.CircularImageView
+                  android:id="@+id/image"
+                  android:layout_width="200dp"
+                  android:layout_height="200dp"
+                  android:src="@drawable/disk_music"
+                  app:civ_border_color="@color/colorYellow"
+                  app:civ_shadow="true"
+                  app:civ_shadow_radius="0" />-->
+            <com.chibde.visualizer.CircleBarVisualizer
+                android:id="@+id/visualizer"
+                android:layout_width="match_parent"
+                android:layout_height="250dp"/>
+
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/tv_nameSong"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            android:textColor="@color/colorYellow" />
+
+    </LinearLayout>
+
+    <!--   <android.support.v7.widget.Toolbar
+           android:id="@+id/toolbar"
+           android:layout_width="match_parent"
+           android:layout_height="?attr/actionBarSize"
+           android:background="@android:color/transparent"
+           android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+           app:contentInsetStartWithNavigation="0dp"
+           app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+
+           <LinearLayout
+               android:layout_width="match_parent"
+               android:layout_height="match_parent"
+               android:gravity="center"
+               android:orientation="vertical">
+
+               <TextView
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:text="now_playing"
+                   android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+                   android:textColor="@android:color/white"
+                   android:textStyle="bold"
+                   android:id="@+id/now_play"/>
+
+           </LinearLayout>
+       </android.support.v7.widget.Toolbar>-->
+
+</RelativeLayout>

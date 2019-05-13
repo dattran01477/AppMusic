@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/album"
+        android:title="album"/>
+    <item
+        android:id="@+id/singer"
+        android:title="singer"/>
+    <item
+        android:id="@+id/play_list"
+        android:title="playlist"/>
+    <item
+        android:id="@+id/all_song"
+        android:title="song"/>
+</menu>
