@@ -97,11 +97,6 @@ public class PlayerService  extends Service implements MediaPlayer.OnPreparedLis
 
     private static final int NOTIFY_ID=1;
 
-
-
-
-
-
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -180,6 +175,7 @@ public class PlayerService  extends Service implements MediaPlayer.OnPreparedLis
         initMusicPlayer();
     }
 
+    //truyen thong tin bang broadcast
     private void sendInfoBroadcast() {
         if (player == null || songs.get(songPosn) == null)
             return;
@@ -194,6 +190,7 @@ public class PlayerService  extends Service implements MediaPlayer.OnPreparedLis
         sendBroadcast(updateIntent);
     }
 
+    //Khoi tao mediaplayer
     public void initMusicPlayer(){
         player.setWakeMode(getApplicationContext(),
                 PowerManager.PARTIAL_WAKE_LOCK);
@@ -201,17 +198,18 @@ public class PlayerService  extends Service implements MediaPlayer.OnPreparedLis
         player.setOnPreparedListener(this);
         player.setOnCompletionListener(this);
         player.setOnErrorListener(this);
-
-
     }
 
+    //set list nhac
     public void setPlayList(ArrayList<Song> theSongs){
         this.songs=theSongs;
+        //dang ki broadcastReceiver de nhan du lieu tu broadcast
         registerReceiver(receiver, new IntentFilter(
                 PlayerService.ACTION_NOTIFICATION_BUTTON_CLICK));
 
 
     }
+    //Binder
     public class MusicBinder extends Binder{
         public PlayerService getService(){
             return PlayerService.this;
@@ -220,7 +218,7 @@ public class PlayerService  extends Service implements MediaPlayer.OnPreparedLis
 
     public void playMusic(){
         player.reset();
-            if(isPlayingOnline){
+            if(isPlayingOnline){//kiem tra xem co phai phat online hay khong, neu co thi dung STREAM_MUSIC
                 isPlayingOnline=false;
                 player.setAudioStreamType(AudioManager.STREAM_MUSIC);
                 try {
@@ -316,8 +314,10 @@ public class PlayerService  extends Service implements MediaPlayer.OnPreparedLis
         return isPlaying;
     }
 
+    //Set bai hat de bat dau choi
     public void setSong(int songIndex){
         songPosn=songIndex;
+        playMusic();
     }
 
     public int getSongPosn(){
@@ -328,6 +328,7 @@ public class PlayerService  extends Service implements MediaPlayer.OnPreparedLis
         return player;
     }
 
+    //set url de de choi online nhac
     public void setUrl(String url){
   /*      if(!(url==null||url=="")){
 
@@ -341,17 +342,17 @@ public class PlayerService  extends Service implements MediaPlayer.OnPreparedLis
         return songs.get(songPosn).getTitle();
     }
 
+    //Intent dung de truyen du lieu cho broadcast
     private PendingIntent onButtonNotificationClick(@IdRes int id) {
         Intent intent = new Intent(ACTION_NOTIFICATION_BUTTON_CLICK);
         intent.putExtra(EXTRA_BUTTON_CLICKED, id);
         return PendingIntent.getBroadcast(this, id, intent, 0);
     }
-
+    //hien thi notification khi an choi nhac
     private void showNotification() {
 
         RemoteViews notificationLayout =
                 new RemoteViews(getPackageName(), R.layout.musicnotification);
-
         //set attribute
         notificationLayout.setTextViewText(R.id.textSongName,getSongNameCurrent());
       /*  notificationLayout.setImageViewResource(R.id.btnPause,isPlaying?R.drawable.ic_pause:R.drawable.ic_play);*/
@@ -374,6 +375,7 @@ public class PlayerService  extends Service implements MediaPlayer.OnPreparedLis
         notificationManager.notify(1, notification);
     }
 
+    //xu ly khi nhac duoc du lieu tu broadcast
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override public void onReceive(Context context, Intent intent) {
             int id = intent.getIntExtra(EXTRA_BUTTON_CLICKED, -1);
@@ -399,6 +401,7 @@ public class PlayerService  extends Service implements MediaPlayer.OnPreparedLis
         }
     };
 
+    //update info thoi gian hien tai cua bai nhac
     private void startUiUpdateThread() {
         isUpdatingThread = true;
         if (updateThread == null) {
@@ -432,7 +435,4 @@ public class PlayerService  extends Service implements MediaPlayer.OnPreparedLis
             updateThread.start();
         }
     }
-
-
-
 }

@@ -1,7 +1,13 @@
 package com.tranthanhdat.mucsicplayergroup2.database;
 
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
+import android.database.Cursor;
+import android.net.Uri;
+import android.provider.MediaStore;
+
+import com.tranthanhdat.mucsicplayergroup2.model.Song;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -9,6 +15,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 
 public class InternalStorage {
     private InternalStorage() {}
@@ -40,4 +47,5 @@ public class InternalStorage {
         }
         return true;
     }
+
 }

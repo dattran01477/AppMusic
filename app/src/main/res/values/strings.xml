@@ -11,4 +11,7 @@
     <string name="btn_scanMusic">Scan Music</string>
     <string name="appwidget_text">EXAMPLE</string>
     <string name="add_widget">Add widget</string>
+    <string name="nav_Online">Online</string>
+    <string name="et_id_addplaylist">id playlist</string>
+    <string name="et_name_addplaylist">Name playlist</string>
 </resources>

@@ -38,7 +38,13 @@ public class Song {
 
 
 
-    public Song() {
+    public Song(int id, String title, String artist) {
+        this.id=id;
+        this.mTitle=title;
+        this.mArtist=artist;
+    }
+
+    public Song(){
 
     }
 

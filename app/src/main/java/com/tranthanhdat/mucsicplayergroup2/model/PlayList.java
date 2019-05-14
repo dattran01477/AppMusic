@@ -4,19 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PlayList {
-    private List<Song> songs;
-    private String name;
 
-    public PlayList() {
-        songs = new ArrayList<>();
+    public int getIdPlayList() {
+        return idPlayList;
     }
 
-    public List<Song> getSongs() {
-        return songs;
-    }
-
-    public void setSongs(List<Song> songs) {
-        this.songs = songs;
+    public void setIdPlayList(int idPlayList) {
+        this.idPlayList = idPlayList;
     }
 
     public String getName() {
@@ -26,4 +20,22 @@ public class PlayList {
     public void setName(String name) {
         this.name = name;
     }
+
+    public int getNumberSong() {
+        return numberSong;
+    }
+
+    public void setNumberSong(int numberSong) {
+        this.numberSong = numberSong;
+    }
+
+    private int idPlayList;
+    private String name;
+    private int numberSong;
+
+
+
+
+
+
 }

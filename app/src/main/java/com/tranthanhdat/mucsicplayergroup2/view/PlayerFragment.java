@@ -134,11 +134,9 @@ public class PlayerFragment extends Fragment {
         }
     };
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         View view = inflater.inflate(R.layout.fragment_player, container, false);
         setComponets(view);
         if(isBinding){
@@ -173,12 +171,11 @@ public class PlayerFragment extends Fragment {
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                if(i==0){
+                if(seekBar.getMax()!=0){
                     if(i==seekBar.getMax()){
                         passData(PlayerFragment.Next_Music);
                     }
                 }
-
                 String currentPositionStr = millisecondsToString(i);
                 tvTimeCurrent.setText(currentPositionStr);
             }
@@ -303,6 +300,7 @@ public class PlayerFragment extends Fragment {
     public void setSongName(String songName) {
         this.songName = songName;
     }
+
     public void setVisualizer(){
         circleBarVisualizer.setPlayer(idSessionMedia);
     }

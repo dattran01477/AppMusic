@@ -6,11 +6,11 @@
         android:title="album"/>
     <item
         android:id="@+id/singer"
-        android:title="singer"/>
+        android:title="Songs"/>
     <item
         android:id="@+id/play_list"
-        android:title="playlist"/>
+        android:title="playlists"/>
     <item
         android:id="@+id/all_song"
-        android:title="song"/>
+        android:title="Online"/>
 </menu>

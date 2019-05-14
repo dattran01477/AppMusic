@@ -7,7 +7,21 @@
     tools:context=".view.MainActivity"
     tools:menu="@menu/menu_itemplaylist">
 
-
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_Add"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:layout_margin="16dp"
+        android:backgroundTint="@color/colorDarkDrange"
+        app:elevation="12dp"
+        app:borderWidth="0dp"
+        app:fabSize="normal"
+        android:onClick="addPlayList"
+        app:rippleColor="@android:color/white"
+        app:srcCompat="@drawable/ic_plus"
+        android:tint="@android:color/white"
+        tools:ignore="VectorDrawableCompat" />
 
 
     <LinearLayout
@@ -22,20 +36,11 @@
             android:layout_height="wrap_content"
             android:layout_margin="6dp"
             android:background="@android:color/transparent">
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="35dp"
 
-                android:background="@drawable/backgroundcard"
-                android:layout_marginBottom="3dp"
-                android:onClick="scanMusic"
-                android:text="@string/btn_scanMusic"
-
-                />
         </LinearLayout>
 
         <android.support.v7.widget.RecyclerView
-            android:id="@+id/rv_songs"
+            android:id="@+id/rv_playlists"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 

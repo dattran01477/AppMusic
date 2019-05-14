@@ -19,5 +19,5 @@
     <item
         android:id="@+id/nav_album"
         android:icon="@drawable/ic_album"
-        android:title="@string/nav_album" />
+        android:title="@string/nav_Online" />
 </menu>

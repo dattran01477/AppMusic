@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/colorWhiteTransparent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="20dp"
+    >
+
+    <EditText
+        android:id="@+id/tv_id_addplaylist"
+        android:hint="@string/et_id_addplaylist"
+        android:textColorHint="@color/colorPrimaryDark"
+        android:textColor="@color/colorPrimaryDark"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="15dp"
+
+        />
+
+    <EditText
+        android:id="@+id/tv_name_addplaylist"
+        android:hint="@string/et_name_addplaylist"
+        android:textColorHint="@color/colorPrimaryDark"
+        android:textColor="@color/colorPrimaryDark"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="15dp"
+
+        />
+
+    <Button
+        android:id="@+id/btn_add_addplaylist"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="addMyPlayList"
+        android:text="Play"
+        android:backgroundTint="@color/colorDarkDrange"
+        android:textColor="@color/colorWhite"/>
+</LinearLayout>
