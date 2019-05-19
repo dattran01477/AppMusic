@@ -16,11 +16,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".view.AddPlayListActivity"></activity>
+        <activity android:name=".view.SongFoPlayListActivity"></activity>
 
         <receiver android:name=".view.PlayerWidget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="SEPARATE_APP_ACTION" />
             </intent-filter>
 
             <meta-data

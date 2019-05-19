@@ -10,6 +10,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/title_namesong_widget"
         android:text="Chỉ còn là quá khứ"
         android:fontFamily="../assets/font/LithosPro-Regular.otf"
         android:textAlignment="center"

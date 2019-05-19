@@ -7,7 +7,6 @@
     android:layout_marginLeft="6dp"
     android:layout_marginRight="6dp"
     android:layout_marginBottom="3dp"
-    android:longClickable="true"
     card_view:cardBackgroundColor="@android:color/transparent"
     card_view:cardCornerRadius="8dp"
 
@@ -21,18 +20,16 @@
         android:paddingTop="3dp"
         android:paddingRight="6dp"
         android:paddingBottom="3dp"
-        android:onClick="songPicked"
-        android:longClickable="true"
-        android:id="@+id/card_row">
+        android:id="@+id/card_row_songforplaylist">
 
         <FrameLayout
-            android:id="@+id/fl_code"
+            android:id="@+id/fl_code_songforplaylist"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_centerVertical="true">
 
             <ImageView
-                android:id="@+id/image_song"
+                android:id="@+id/image_song_songforplaylist"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#19b395"
@@ -44,12 +41,11 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginLeft="8dp"
-
-            android:layout_toRightOf="@+id/fl_code"
+            android:layout_toRightOf="@+id/fl_code_songforplaylist"
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/tv_title"
+                android:id="@+id/tv_title_songforplaylist"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:lineSpacingExtra="20dp"
@@ -61,7 +57,7 @@
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/tv_lyric"
+                android:id="@+id/tv_lyric_songforplaylist"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
@@ -70,7 +66,7 @@
                 android:textSize="12dp" />
 
             <TextView
-                android:id="@+id/tv_artist"
+                android:id="@+id/tv_artist_songforplaylist"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/lithosproregular"

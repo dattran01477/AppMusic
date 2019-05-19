@@ -5,13 +5,16 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.support.annotation.IdRes;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.RemoteViews;
+import android.widget.TextView;
 
 import com.tranthanhdat.mucsicplayergroup2.R;
 import com.tranthanhdat.mucsicplayergroup2.service.PlayerService;
@@ -23,17 +26,34 @@ public class PlayerWidget extends AppWidgetProvider {
 
     private static final String TAG = "Music Widget";
     public static final String ACTION_PLAY_PAUSE = "com.smartpocket.musicwidget.play_pause";
+    public static final String UPDATE_WIDGET = "UPDATE_WIDGET";
     public static final String ACTION_STOP = "com.smartpocket.musicwidget.stop";
     public static final String ACTION_NEXT = "com.smartpocket.musicwidget.next";
     public static final String ACTION_PREVIOUS = "com.smartpocket.musicwidget.previous";
     public static final String ACTION_SHUFFLE = "com.smartpocket.musicwidget.shuffle";
     public static final String ACTION_JUMP_TO = "com.smartpocket.musicwidget.jump_to";
 
+    private RemoteViews remoteViews;
+
+    private BroadcastReceiver receiver=new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(PlayerService.GUI_UPDATE_ACTION)) {
+                if (intent.hasExtra(PlayerService.TITLE_EXTRA)) {
+                    String titleTmp = intent.getStringExtra(PlayerService.TITLE_EXTRA);
+                    remoteViews.setTextViewText(R.id.title_namesong_widget,titleTmp);
+                }
+            }
+        }
+    };
+
+
 
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         associateIntents(context);
+
         Log.d(TAG, "Widget's onUpdate()");
     }
 
@@ -75,7 +95,7 @@ public class PlayerWidget extends AppWidgetProvider {
     private void associateIntents(Context context) {
 
         try {
-            RemoteViews remoteViews = getRemoteViews(context);
+            remoteViews = getRemoteViews(context);
 
             // Push update for this widget to the home screen
             ComponentName thisWidget = new ComponentName(context, PlayerWidget.class);
@@ -84,6 +104,8 @@ public class PlayerWidget extends AppWidgetProvider {
         }
         catch (Exception e)
         {}
+
+
     }
 
     @Override
@@ -102,6 +124,9 @@ public class PlayerWidget extends AppWidgetProvider {
             serviceIntent.setAction(action);
             context.startService(serviceIntent);
         }
+        /*else if(action.equals("SEPARATE_APP_ACTION")){
+            remoteViews.setTextViewText(R.id.title_namesong_widget,intent.getStringExtra("Name"));
+        }*/
         else
         {
             super.onReceive(context, intent);

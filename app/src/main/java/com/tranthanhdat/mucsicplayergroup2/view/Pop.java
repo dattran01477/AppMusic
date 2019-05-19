@@ -28,9 +28,12 @@ public class Pop extends Activity {
     }
     public void addOnline(View view) {
 
-        TextView textView =findViewById(R.id.tv_url);
+        TextView textViewUrl =findViewById(R.id.tv_url);
+        TextView tvNameSong =findViewById(R.id.tv_name_songonline);
+
         Intent data = new Intent();
-        data.putExtra("Url",textView.getText().toString());
+        data.putExtra("Url",textViewUrl.getText().toString());
+        data.putExtra("Name",tvNameSong.getText().toString());
 
         // Activity đã hoàn thành OK, trả về dữ liệu.
         this.setResult(Activity.RESULT_OK, data);

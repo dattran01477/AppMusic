@@ -5,11 +5,13 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.tranthanhdat.mucsicplayergroup2.model.PlayList;
 import com.tranthanhdat.mucsicplayergroup2.model.Song;
+import com.tranthanhdat.mucsicplayergroup2.model.TrackSongOnline;
 import com.tranthanhdat.mucsicplayergroup2.view.MainActivity;
 
 import java.util.ArrayList;
@@ -33,6 +35,8 @@ public class DatabaseSqlite extends SQLiteOpenHelper {
     private static final String TABLE_PLAYLIST = "PLAYLIST";
     // Tên bảng: Note.
     private static final String TABLE_PLAYLISTSONG = "SONG_PLAYLIST";
+
+    private static final  String TABLE_TRACK_ONLINE="TRACK_ONLINE";
 
     public DatabaseSqlite(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -59,19 +63,24 @@ public class DatabaseSqlite extends SQLiteOpenHelper {
                 "artist VARCHAR," +
                 "filePath)";
         String scripCreatePlaylist="CREATE TABLE IF NOT EXISTS PLAYLIST(" +
-                "idPlayList INTEGER PRIMARY KEY," +
+                "idPlayList INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "namePlayList VARCHAR," +
                 "imagePlayList)";
         String scripCreatePlaylistSong="CREATE TABLE IF NOT EXISTS SONG_PLAYLIST(" +
                 "idSong INTEGER," +
                 "idPlayList INTEGER,"+
                 "PRIMARY KEY (idSong, idPlayList))";
+        String scripCreateTrackOnline="CREATE TABLE IF NOT EXISTS TRACK_ONLINE(" +
+                "idSong INTEGER  PRIMARY KEY AUTOINCREMENT," +
+                "nameSong VARCHAR,"+
+                "urlSong VARCHAR)";
 
 
         // Chạy lệnh tạo bảng.
         db.execSQL(script1);
         db.execSQL(scripCreatePlaylist);
         db.execSQL(scripCreatePlaylistSong);
+        db.execSQL(scripCreateTrackOnline);
     }
 
     @Override
@@ -80,6 +89,7 @@ public class DatabaseSqlite extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_SONG);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PLAYLIST);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PLAYLISTSONG);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_TRACK_ONLINE);
         // Và tạo lại.
         onCreate(db);
     }
@@ -93,6 +103,7 @@ public class DatabaseSqlite extends SQLiteOpenHelper {
         values.put("idSong", song.getId());
         values.put("nameSong", song.getTitle());
         values.put("artist",song.getArtist());
+        values.put("filePath",song.getmImageUrl().toString());
 
 
 
@@ -103,11 +114,28 @@ public class DatabaseSqlite extends SQLiteOpenHelper {
         // Đóng kết nối database.
         db.close();
     }
+
+    public void addTrackSong(TrackSongOnline song) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put("nameSong", song.getNameSong());
+        values.put("urlSong",song.getUrl());
+
+
+
+        // Trèn một dòng dữ liệu vào bảng.
+        db.insert(TABLE_TRACK_ONLINE, null, values);
+
+
+        // Đóng kết nối database.
+        db.close();
+    }
+
     public void addPlayList(PlayList playList){
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put("idPlayList", playList.getIdPlayList());
         values.put("namePlayList", playList.getName());
 
         // Trèn một dòng dữ liệu vào bảng.
@@ -149,13 +177,13 @@ public class DatabaseSqlite extends SQLiteOpenHelper {
                 "filePath)";*/
 
         Cursor cursor = db.query(TABLE_SONG, new String[] { "idSong",
-                        "nameSong", "artist" }, "idSong" + "=?",
+                        "nameSong", "artist","filePath" }, "idSong" + "=?",
                 new String[] { String.valueOf(id) }, null, null, null, null);
         if (cursor != null)
             cursor.moveToFirst();
 
         Song song = new Song(Integer.parseInt(cursor.getString(0)),
-                cursor.getString(1), cursor.getString(2));
+                cursor.getString(1), cursor.getString(2),cursor.getString(3));
         // return song
         return song;
     }
@@ -178,6 +206,7 @@ public class DatabaseSqlite extends SQLiteOpenHelper {
                 song.setId(Integer.parseInt(cursor.getString(0)));
                 song.setTitle(cursor.getString(1));
                 song.setArtist(cursor.getString(2));
+                song.setmImageUrl(cursor.getString(3));
 
                 // Thêm vào danh sách.
                 songs.add(song);
@@ -215,6 +244,34 @@ public class DatabaseSqlite extends SQLiteOpenHelper {
         return playLists;
     }
 
+    public ArrayList<TrackSongOnline> getAllTrackSong() {
+        Log.i(TAG, "MyDatabaseHelper.getAllNotes ... " );
+
+        ArrayList<TrackSongOnline> trackSongs = new ArrayList<TrackSongOnline>();
+        // Select All Query
+        String selectQuery = "SELECT  * FROM " + TABLE_TRACK_ONLINE;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+
+        // Duyệt trên con trỏ, và thêm vào danh sách.
+        if (cursor.moveToFirst()) {
+            do {
+                TrackSongOnline song = new TrackSongOnline();
+                song.setId(Integer.parseInt(cursor.getString(0)));
+                song.setNameSong(cursor.getString(1));
+                song.setUrl(cursor.getString(2));
+
+                // Thêm vào danh sách.
+                trackSongs.add(song);
+            } while (cursor.moveToNext());
+        }
+
+        // return note list
+        return trackSongs;
+    }
+
     private int getCountSongForPlaylist(int idPlayList) {
         int count=0;
 
@@ -236,10 +293,36 @@ public class DatabaseSqlite extends SQLiteOpenHelper {
         return count;
     }
 
-    private ArrayList<PlayList> getSongForPlayList(int idPlayList){
+    public ArrayList<Song> getSongForPlayList(int idPlayList){
         ArrayList<PlayList> playLists=new ArrayList<>();
+        Log.i(TAG, "MyDatabaseHelper.getAllNotes ... " );
 
-        return playLists;
+        ArrayList<Song> songs = new ArrayList<Song>();
+        // Select All Query
+        String selectQuery = "SELECT  * FROM " +TABLE_SONG +","+TABLE_PLAYLISTSONG+" " +
+                "WHERE idPlayList="+idPlayList+
+                " and SONG_PLAYLIST.idSong=SONG.idSong";
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+
+        // Duyệt trên con trỏ, và thêm vào danh sách.
+        if (cursor.moveToFirst()) {
+            do {
+                Song song = new Song();
+                song.setId(Integer.parseInt(cursor.getString(0)));
+                song.setTitle(cursor.getString(1));
+                song.setArtist(cursor.getString(2));
+                song.setmImageUrl(cursor.getString(3));
+
+                // Thêm vào danh sách.
+                songs.add(song);
+            } while (cursor.moveToNext());
+        }
+
+        // return note list
+        return songs;
 
     }
 
@@ -256,6 +339,14 @@ public class DatabaseSqlite extends SQLiteOpenHelper {
 
         // return count
         return count;
+    }
+
+    public void updateSong(Song mSong){
+        String query="UPDATE SONG" +
+                " SET nameSong = '"+mSong.getTitle()+"', artist = '"+mSong.getArtist()+"',filePath = '"+mSong.getmImageUrl()+"'" +
+                " WHERE idSong="+mSong.getId()+"";
+        SQLiteDatabase db = this.getReadableDatabase();
+        db.execSQL(query);
     }
 }
 

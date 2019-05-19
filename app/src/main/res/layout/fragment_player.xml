@@ -9,12 +9,6 @@
     tools:context=".view.MainActivity">
 
 
-    <!-- <com.jgabrielfreitas.core.BlurImageView
-         android:layout_width="match_parent"
-         android:layout_height="match_parent"
-         android:scaleType="fitXY"
-         android:id="@+id/background_blur"
-         android:src="@drawable/background" />-->
 
     <View
         android:layout_width="match_parent"
@@ -30,6 +24,18 @@
             android:layout_width="match_parent"
             android:layout_height="200dp" />
 
+        <ImageButton xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/btn_timeSleep"
+            android:layout_width="?attr/actionBarSize"
+            android:layout_height="?attr/actionBarSize"
+            android:layout_gravity="right"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:tint="@android:color/white"
+            app:srcCompat="@drawable/timesleep"
+            tools:ignore="VectorDrawableCompat"
+            android:layout_margin="30dp"
+            tools:srcCompat="@drawable/ic_repeat" />
+
         <LinearLayout
             android:id="@+id/player_control"
             android:layout_width="match_parent"
@@ -37,6 +43,7 @@
             android:background="@android:color/black"
             android:orientation="vertical"
             android:padding="15dp">
+
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -62,6 +69,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:progress="0"
+                    android:backgroundTint="@color/colorDarkDrange"
                     android:progressDrawable="@drawable/ic_seekbarthumb" />
 
                 <ImageButton

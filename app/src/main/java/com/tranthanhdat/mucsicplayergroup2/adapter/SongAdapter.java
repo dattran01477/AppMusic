@@ -1,7 +1,7 @@
 package com.tranthanhdat.mucsicplayergroup2.adapter;
 
-import android.app.AlertDialog;
 import android.content.Context;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -10,17 +10,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.tranthanhdat.mucsicplayergroup2.R;
 import com.tranthanhdat.mucsicplayergroup2.model.Song;
 import com.tranthanhdat.mucsicplayergroup2.view.ListSongFragment;
-import com.tranthanhdat.mucsicplayergroup2.view.MainActivity;
-import com.tranthanhdat.mucsicplayergroup2.view.PlayListFragment;
 
+import java.net.URI;
 import java.util.List;
 
 public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder>  {
@@ -52,7 +50,11 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
 
         //bind data to viewholder
 /*        holder.tvCode.setText(song.getCode());*/
-        holder.tvImage.setImageResource(R.drawable.image_album);
+     Glide.with(listSongFragment).load(Uri.parse(song.getmImageUrl())).placeholder(R.drawable.image_album).error(R.drawable.image_album).centerCrop().into(holder.tvImage);
+
+       /* holder.tvImage.setImageResource(R.drawable.image_album);*/
+    /*    holder.tvImage.setImageURI(null);
+        holder.tvImage.setImageURI(song.getmImageUrl());*/
         holder.tvTitle.setText(song.getTitle());
         holder.rltLayout.setTag(position);
         holder.tvLyric.setText(song.getId()+"");
@@ -92,8 +94,10 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
         public void onCreateContextMenu(ContextMenu contextMenu, View view, ContextMenu.ContextMenuInfo contextMenuInfo) {
             MenuItem addPlayList = contextMenu.add(contextMenu.NONE, 1, 1, "Add to play list");
             MenuItem Delete = contextMenu.add(contextMenu.NONE, 2, 2, "Delete");
+            MenuItem Edit = contextMenu.add(contextMenu.NONE, 3, 3, "Edit");
             addPlayList.setOnMenuItemClickListener(onEditMenu);
             Delete.setOnMenuItemClickListener(onEditMenu);
+            Edit.setOnMenuItemClickListener(onEditMenu);
         }
 
         private final MenuItem.OnMenuItemClickListener onEditMenu = new MenuItem.OnMenuItemClickListener() {
@@ -106,6 +110,9 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
 
                     case 2:
                         //Do stuff
+                        break;
+                    case 3:
+                        listSongFragment.showDialogEditPlaylist(Integer.parseInt(tvLyric.getText().toString()));
                         break;
                 }
                 return true;

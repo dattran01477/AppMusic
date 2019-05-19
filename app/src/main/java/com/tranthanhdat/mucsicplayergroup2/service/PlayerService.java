@@ -1,6 +1,7 @@
 package com.tranthanhdat.mucsicplayergroup2.service;
 
 import android.annotation.SuppressLint;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -13,6 +14,7 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.SystemClock;
@@ -64,6 +66,7 @@ public class PlayerService  extends Service implements MediaPlayer.OnPreparedLis
     public final static String DELETE_ACTION = "DELETE_ACTION";
     public final static String MINUS_TIME_ACTION = "MINUS_TIME_ACTION";
     public final static String PLUS_TIME_ACTION = "PLUS_TIME_ACTION";
+    public final static String PLAYONLINE_ACTION = "PLAYONLINE_ACTION";
 
     public final static String TOTAL_TIME_VALUE_EXTRA = "TOTAL_TIME_VALUE_EXTRA";
     public final static String ACTUAL_TIME_VALUE_EXTRA = "ACTUAL_TIME_VALUE_EXTRA";
@@ -124,9 +127,11 @@ public class PlayerService  extends Service implements MediaPlayer.OnPreparedLis
     public void onPrepared(MediaPlayer mediaPlayer) {
         isPlaying=true;
         mediaPlayer.start();
-        showNotification();
         sendInfoBroadcast();
         startUiUpdateThread();
+
+        Intent intentPause=new Intent(PLAY_ACTION);
+        sendBroadcast(intentPause);
     }
 
     @SuppressLint("WrongConstant")
@@ -179,15 +184,22 @@ public class PlayerService  extends Service implements MediaPlayer.OnPreparedLis
     private void sendInfoBroadcast() {
         if (player == null || songs.get(songPosn) == null)
             return;
-        Intent updateIntent = new Intent();
-        updateIntent.setAction(GUI_UPDATE_ACTION);
-        updateIntent.putExtra(ARTIST_EXTRA, songs.get(songPosn).getArtist());
-        updateIntent.putExtra(TITLE_EXTRA, songs.get(songPosn).getTitle());
-        updateIntent.putExtra(ACTUAL_TIME_VALUE_EXTRA, player.getCurrentPosition());
-        updateIntent.putExtra(TOTAL_TIME_VALUE_EXTRA, player.getDuration());
-        updateIntent.putExtra(SONG_NUM_EXTRA, songPosn);
-        updateIntent.putExtra(MEDIAPLAY_SESSIONID, player.getAudioSessionId());
-        sendBroadcast(updateIntent);
+        if(isPlayingOnline){
+
+        }
+        else {
+            Intent updateIntent = new Intent();
+            updateIntent.setAction(GUI_UPDATE_ACTION);
+            updateIntent.putExtra(ARTIST_EXTRA, songs.get(songPosn).getArtist());
+            updateIntent.putExtra(TITLE_EXTRA, songs.get(songPosn).getTitle());
+            updateIntent.putExtra(ACTUAL_TIME_VALUE_EXTRA, player.getCurrentPosition());
+            updateIntent.putExtra(TOTAL_TIME_VALUE_EXTRA, player.getDuration());
+            updateIntent.putExtra(SONG_NUM_EXTRA, songPosn);
+            updateIntent.putExtra(MEDIAPLAY_SESSIONID, player.getAudioSessionId());
+            sendBroadcast(updateIntent);
+
+
+        }
     }
 
     //Khoi tao mediaplayer
@@ -198,6 +210,7 @@ public class PlayerService  extends Service implements MediaPlayer.OnPreparedLis
         player.setOnPreparedListener(this);
         player.setOnCompletionListener(this);
         player.setOnErrorListener(this);
+
     }
 
     //set list nhac
@@ -330,50 +343,21 @@ public class PlayerService  extends Service implements MediaPlayer.OnPreparedLis
 
     //set url de de choi online nhac
     public void setUrl(String url){
-  /*      if(!(url==null||url=="")){
-
-        }*/
-
         isPlayingOnline=true;
         this.urlMusic=url;
+        playMusic();
     }
 
     public String getSongNameCurrent(){
         return songs.get(songPosn).getTitle();
     }
 
-    //Intent dung de truyen du lieu cho broadcast
-    private PendingIntent onButtonNotificationClick(@IdRes int id) {
-        Intent intent = new Intent(ACTION_NOTIFICATION_BUTTON_CLICK);
-        intent.putExtra(EXTRA_BUTTON_CLICKED, id);
-        return PendingIntent.getBroadcast(this, id, intent, 0);
+    public long getTimeDuration(){
+        return player.getDuration();
     }
-    //hien thi notification khi an choi nhac
-    private void showNotification() {
 
-        RemoteViews notificationLayout =
-                new RemoteViews(getPackageName(), R.layout.musicnotification);
-        //set attribute
-        notificationLayout.setTextViewText(R.id.textSongName,getSongNameCurrent());
-      /*  notificationLayout.setImageViewResource(R.id.btnPause,isPlaying?R.drawable.ic_pause:R.drawable.ic_play);*/
+    public String getImageUrlSong(){return songs.get(songPosn).getmImageUrl();}
 
-        notificationLayout.setOnClickPendingIntent(R.id.btnPrevious,
-                onButtonNotificationClick(R.id.btnPrevious));
-        notificationLayout.setOnClickPendingIntent(R.id.btnNext,
-                onButtonNotificationClick(R.id.btnNext));
-        notificationLayout.setOnClickPendingIntent(R.id.btnPause,
-                onButtonNotificationClick(R.id.btnPause));
-
-        Notification
-                notification = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setCustomContentView(notificationLayout)
-                .build();
-        NotificationManager notificationManager =
-                (android.app.NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        notificationManager.notify(1, notification);
-    }
 
     //xu ly khi nhac duoc du lieu tu broadcast
     private BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -383,18 +367,24 @@ public class PlayerService  extends Service implements MediaPlayer.OnPreparedLis
                 case R.id.btnPrevious:
                     preBack();
                     playMusic();
-
+                    Intent intentPrevious=new Intent(PREVIOUS_ACTION);
+                    sendBroadcast(intentPrevious);
                     break;
                 case R.id.btnNext:
                     nextTo();
                     playMusic();
-
+                    Intent intentNext=new Intent(NEXT_ACTION);
+                    sendBroadcast(intentNext);
                     break;
                 case R.id.btnPause:
                     if (isPlaying) {
                         pauseMusic();
+                        Intent intentPause=new Intent(PAUSE_ACTION);
+                        sendBroadcast(intentPause);
                     } else {
                         contrinuteMusic();
+                        Intent intentPause=new Intent(PLAY_ACTION);
+                        sendBroadcast(intentPause);
                     }
                     break;
             }
@@ -404,6 +394,7 @@ public class PlayerService  extends Service implements MediaPlayer.OnPreparedLis
     //update info thoi gian hien tai cua bai nhac
     private void startUiUpdateThread() {
         isUpdatingThread = true;
+
         if (updateThread == null) {
             updateThread = new Thread(new Runnable() {
                 @Override
@@ -419,20 +410,31 @@ public class PlayerService  extends Service implements MediaPlayer.OnPreparedLis
                     }
 
                     while (isPlaying) {
-                            Log.e("Duration",player.getDuration()+"");
+                            Log.e("Duration",player.getCurrentPosition()+"");
                             guiUpdateIntent.putExtra(ACTUAL_TIME_VALUE_EXTRA, player.getCurrentPosition());
                             sendBroadcast(guiUpdateIntent);
                             try {
-                                Thread.sleep(200);
+                                Thread.sleep(500);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
+
                     }
                     updateThread = null;
                 }
             });
 
             updateThread.start();
+        }
+    }
+
+    private void setImageRourceNotifiCation(){
+        RemoteViews notificationLayout =
+                new RemoteViews(getPackageName(), R.layout.musicnotification);
+        if(isPlaying){
+            notificationLayout.setImageViewResource(R.id.btnPause,R.drawable.ic_play);
+        }else {
+            notificationLayout.setImageViewResource(R.id.btnPause,R.drawable.ic_pause);
         }
     }
 }

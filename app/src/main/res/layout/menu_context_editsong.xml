@@ -9,8 +9,7 @@
     >
 
     <EditText
-        android:id="@+id/tv_name_addplaylist"
-        android:hint="@string/et_name_addplaylist"
+        android:id="@+id/et_name_songedit_menucontext"
         android:textColorHint="@color/colorPrimaryDark"
         android:textColor="@color/colorPrimaryDark"
         android:layout_width="match_parent"
@@ -20,11 +19,11 @@
         />
 
     <Button
-        android:id="@+id/btn_add_addplaylist"
+        android:id="@+id/btn_update_songedit_menucontext"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="addMyPlayList"
-        android:text="Add"
+        android:text="Update"
         android:backgroundTint="@color/colorDarkDrange"
         android:textColor="@color/colorWhite"/>
 </LinearLayout>

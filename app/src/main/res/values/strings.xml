@@ -14,4 +14,7 @@
     <string name="nav_Online">Online</string>
     <string name="et_id_addplaylist">id playlist</string>
     <string name="et_name_addplaylist">Name playlist</string>
+    <string name="url_song">Url</string>
+    <string name="name_songonline">Name</string>
+    <string name="et_id_timesleep">Time sleep</string>
 </resources>

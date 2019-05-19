@@ -2,10 +2,14 @@ package com.tranthanhdat.mucsicplayergroup2.view;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -15,6 +19,8 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Build;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.SystemClock;
@@ -26,6 +32,7 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -35,9 +42,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.RemoteViews;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.chibde.visualizer.CircleBarVisualizer;
 import com.jgabrielfreitas.core.BlurImageView;
 import com.mikhaellopez.circularimageview.CircularImageView;
@@ -46,6 +55,7 @@ import com.tranthanhdat.mucsicplayergroup2.database.DatabaseSqlite;
 import com.tranthanhdat.mucsicplayergroup2.database.InternalStorage;
 import com.tranthanhdat.mucsicplayergroup2.model.PlayList;
 import com.tranthanhdat.mucsicplayergroup2.model.Song;
+import com.tranthanhdat.mucsicplayergroup2.model.TrackSongOnline;
 import com.tranthanhdat.mucsicplayergroup2.service.PlayerService;
 
 import java.io.IOException;
@@ -55,6 +65,12 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements PlayerFragment.OnDataPass {
 
     public final  static String UPDATE_UI_PLAYLIST="UPDATE_UI_PLAYLIST";
+    public final  static String UPDATE_UI_LISTSONGONLINE="UPDATE_UI_LISTSONGONLINE";
+    public final  static String UPDATE_UI_LISTSONG="UPDATE_UI_LISTSONG";
+    public final static String UPDATE_LISTSONGS="UPDATE_LISTSONGS";
+    public final static String PLAYMUSIC_FORPLAYLIST="PLAYMUSIC_FORPLAYLIST";
+    final public static Uri sArtworkUri = Uri
+            .parse("content://media/external/audio/albumart");
 
     //Strorge
     private InternalStorage internalStorage;
@@ -79,6 +95,38 @@ public class MainActivity extends AppCompatActivity implements PlayerFragment.On
     ArrayList<Song> songList;
     ArrayList<Song> songUrlList;
 
+    private BroadcastReceiver receiver=new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(MainActivity.UPDATE_LISTSONGS)) {
+                int idPlayList= (int) intent.getIntExtra("idPlayList",0);
+                if(idPlayList==0){
+                    songList=db.getAllSong();
+                }
+                else {
+                    songList=db.getSongForPlayList(idPlayList);
+                }
+                playerService.setPlayList(songList);
+            }
+            if(intent.getAction().equals(MainActivity.PLAYMUSIC_FORPLAYLIST)){
+                int songPosn=intent.getIntExtra("songPosn",1);
+                playerService.setSong(songPosn);
+                playerSongFragment.setSongName(playerService.getSongNameCurrent());
+            }
+            if(intent.getAction().equals(PlayerService.PLAYONLINE_ACTION)){
+                String url=intent.getStringExtra("url");
+                playerService.setUrl(url);
+            }
+
+            if (intent.getAction().equals(PlayerService.PAUSE_ACTION)||
+                    intent.getAction().equals(PlayerService.PLAY_ACTION)||
+                    intent.getAction().equals(PlayerService.NEXT_ACTION)||
+                    intent.getAction().equals(PlayerService.PREVIOUS_ACTION)){
+                showNotification();
+            }
+        }
+    };
+
     //Connect voi service
     private ServiceConnection mucsicServiceConnection = new ServiceConnection() {
         @Override
@@ -92,7 +140,6 @@ public class MainActivity extends AppCompatActivity implements PlayerFragment.On
             playerService.setPlayList(songList);
         /*    registerReceiver(receiver, new IntentFilter(
                     PlayerService.ACTION_NOTIFICATION_BUTTON_CLICK));*/
-
             musicbound = true;
         }
         @Override
@@ -100,6 +147,13 @@ public class MainActivity extends AppCompatActivity implements PlayerFragment.On
             musicbound = false;
         }
     };
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(receiver);
+        playerService.onDestroy();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,11 +185,12 @@ public class MainActivity extends AppCompatActivity implements PlayerFragment.On
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
                     case R.id.nav_home:
-                        MediaPlayer player = playerService.getPlayer();
+                        playerSongFragment.setTimeDuration((int) playerService.getTimeDuration());
+                        playerSongFragment.setIsplaying(playerService.isPlaying());
                         setFragment(playerSongFragment);
-                       /* playerSongFragment.setMediaPlayer(player);*/
                         return true;
                     case R.id.nav_song:
+                        playerService.setPlayList(db.getAllSong());
                         setFragment(listSongFragment);
                         return true;
                     case R.id.nav_playlist:
@@ -149,6 +204,8 @@ public class MainActivity extends AppCompatActivity implements PlayerFragment.On
                 }
             }
         });
+
+        createNotificationChannel();
     }
 
     @Override
@@ -160,11 +217,13 @@ public class MainActivity extends AppCompatActivity implements PlayerFragment.On
             getApplicationContext().bindService(playerIntent, mucsicServiceConnection, Context.BIND_AUTO_CREATE);
             startService(playerIntent);
         }
+
+
     }
     //Khoi tao cac bien. component can thiet cho chuong trinh
     private void setComponents() {
         Bundle bundle = new Bundle();
-// set Fragmentclass Arguments
+        // set Fragmentclass Arguments
 
         bundle.putSerializable("songList", songList);
 
@@ -179,6 +238,7 @@ public class MainActivity extends AppCompatActivity implements PlayerFragment.On
 
 
         listSongFragment = new ListSongFragment();
+        listSongFragment.setmSongs(songList);
         listSongFragment.onAttach(this);
 
         listOnlineFragment = new ListOnlineFragment();
@@ -188,8 +248,18 @@ public class MainActivity extends AppCompatActivity implements PlayerFragment.On
 
         //blurImage
         blurImageView.setBlur(5);
- /*       // set custom color to the line.
-        circleBarVisualizer.setColor(ContextCompat.getColor( this, R.color.colorDarkDrange));*/
+
+        //set intent filter
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(PlayerService.GUI_UPDATE_ACTION);
+        filter.addAction(MainActivity .PLAYMUSIC_FORPLAYLIST);
+        filter.addAction(MainActivity.UPDATE_LISTSONGS);
+        filter.addAction(PlayerService.NEXT_ACTION);
+        filter.addAction(PlayerService.PREVIOUS_ACTION);
+        filter.addAction(PlayerService.PLAY_ACTION);
+        filter.addAction(PlayerService.PAUSE_ACTION);
+        filter.addAction(PlayerService.PLAYONLINE_ACTION);
+        registerReceiver(receiver, filter);
     }
 
     @Override
@@ -201,15 +271,14 @@ public class MainActivity extends AppCompatActivity implements PlayerFragment.On
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (resultCode == MainActivity.RESULT_OK && requestCode == MY_REQUEST_CODE) {
-            String url = data.getStringExtra("Url");
-            nMainNav.setSelectedItemId(R.id.nav_home);
-            playerService.setUrl(url);
-            playerService.playMusic();
-            MediaPlayer player = playerService.getPlayer();
-            setFragment(playerSongFragment);
-            playerSongFragment.setMediaPlayer(player);
-        } else {
+            TrackSongOnline song=new TrackSongOnline();
+            song.setUrl(data.getStringExtra("Url"));
+            song.setNameSong(data.getStringExtra("Name"));
 
+            db.addTrackSong(song);
+            Toast.makeText(MainActivity.this,"Added Song online",Toast.LENGTH_SHORT).show();
+            Intent updateUiPlaylist=new Intent(MainActivity.UPDATE_UI_LISTSONGONLINE);
+            sendBroadcast(updateUiPlaylist);
         }
     }
     //Set fragment vao main_frame cua main activity
@@ -236,8 +305,9 @@ public class MainActivity extends AppCompatActivity implements PlayerFragment.On
         String a = view.getTag().toString();
         int b = Integer.parseInt(a);
         playerService.setSong(b);
-        SystemClock.sleep(200);
+        /*SystemClock.sleep(200);*/
         setFragment(playerSongFragment);
+        showNotification();
     }
     //scan nhac trong bo nho dien thoai.
     private ArrayList<Song> scanSongInStroge() {
@@ -258,12 +328,16 @@ public class MainActivity extends AppCompatActivity implements PlayerFragment.On
             int ArtisColumn = cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
             int ComposerColumn = cursor.getColumnIndex(MediaStore.Audio.Media.COMPOSER);
             int displayName=cursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME);
+            int album_column_index = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID);
             do {
                 if(cursor.getString(displayName).endsWith(".mp3")){
                     songTmp = new Song();
+                    Uri uri1 = ContentUris.withAppendedId(MainActivity.sArtworkUri,
+                            cursor.getLong(album_column_index));
+                    songTmp.setmImageUrl(uri1.toString());
                     songTmp.setTitle(cursor.getString(titleColumn));
                     songTmp.setId(cursor.getLong(idColumn));
-                    songTmp.setArtist(cursor.getString(titleColumn));
+                    songTmp.setArtist(cursor.getString(ArtisColumn));
                     Songtmps.add(songTmp);
                 }
             } while (cursor.moveToNext());
@@ -272,29 +346,6 @@ public class MainActivity extends AppCompatActivity implements PlayerFragment.On
         return Songtmps;
     }
 
-  /*  private ArrayList<Song> getSongInStrorge() {
-        ArrayList<Song> songTmps = null;
-
-
-        try {
-            songTmps = (ArrayList<Song>) InternalStorage.readObject(this, "lsSong");
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        if (songTmps == null) {
-            songTmps = scanSongInStroge();
-            //write lsSong into inStorage
-            try {
-                InternalStorage.writeObject(this, "lsSong", songTmps);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return songTmps;
-    }*/
     //Nhan data tu player fragment
     @Override
     public void onDataPass(String type) {
@@ -351,7 +402,6 @@ public class MainActivity extends AppCompatActivity implements PlayerFragment.On
         AlertDialog.Builder mbuider=new AlertDialog.Builder(MainActivity.this);
         View mView=getLayoutInflater().inflate(R.layout.activity_add_play_list,null);
 
-        final EditText etIdPlayList=mView.findViewById(R.id.tv_id_addplaylist);
         final EditText etNamePlayList=mView.findViewById(R.id.tv_name_addplaylist);
         Button btnAdd=mView.findViewById(R.id.btn_add_addplaylist);
 
@@ -359,7 +409,6 @@ public class MainActivity extends AppCompatActivity implements PlayerFragment.On
             @Override
             public void onClick(View view) {
                 PlayList playListTmp=new PlayList();
-                playListTmp.setIdPlayList(Integer.parseInt(etIdPlayList.getText().toString()));
                 playListTmp.setName(etNamePlayList.getText().toString());
 
                 try{
@@ -379,4 +428,60 @@ public class MainActivity extends AppCompatActivity implements PlayerFragment.On
         dialog.show();
 
     }
+
+    //Intent dung de truyen du lieu cho broadcast
+    private PendingIntent onButtonNotificationClick(@IdRes int id) {
+        Intent intent = new Intent(playerService.ACTION_NOTIFICATION_BUTTON_CLICK);
+        intent.putExtra(playerService.EXTRA_BUTTON_CLICKED, id);
+        return PendingIntent.getBroadcast(this, id, intent, 0);
+    }
+    //hien thi notification khi an choi nhac
+    private void showNotification() {
+
+        RemoteViews notificationLayout =
+                new RemoteViews(this.getPackageName(), R.layout.musicnotification);
+        //set attribute
+        notificationLayout.setTextViewText(R.id.textSongName,playerService.getSongNameCurrent());
+
+        notificationLayout.setImageViewResource(R.id.btnPause,playerService.isPlaying()?R.drawable.ic_pause:R.drawable.ic_play);
+
+        notificationLayout.setImageViewUri(R.id.image_album_notificaiton,Uri.parse(playerService.getImageUrlSong()));
+
+        notificationLayout.setOnClickPendingIntent(R.id.btnPrevious,
+                onButtonNotificationClick(R.id.btnPrevious));
+        notificationLayout.setOnClickPendingIntent(R.id.btnNext,
+                onButtonNotificationClick(R.id.btnNext));
+        notificationLayout.setOnClickPendingIntent(R.id.btnPause,
+                onButtonNotificationClick(R.id.btnPause));
+
+        Notification
+                notification = new NotificationCompat.Builder(this, playerService.CHANNEL_ID)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setCustomContentView(notificationLayout)
+                .build();
+        NotificationManager notificationManager =
+                (android.app.NotificationManager) getSystemService(playerService.NOTIFICATION_SERVICE);
+        notificationManager.notify(1, notification);
+    }
+
+    private void createNotificationChannel() {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = getString(R.string.channel_name);
+            String description = getString(R.string.channel_description);
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(PlayerService.CHANNEL_ID, name, importance);
+            channel.setDescription(description);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
+
+
+
 }

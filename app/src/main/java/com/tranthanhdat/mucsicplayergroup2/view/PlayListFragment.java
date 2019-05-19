@@ -21,6 +21,7 @@ import com.tranthanhdat.mucsicplayergroup2.R;
 import com.tranthanhdat.mucsicplayergroup2.adapter.PlayListAdapter;
 import com.tranthanhdat.mucsicplayergroup2.database.DatabaseSqlite;
 import com.tranthanhdat.mucsicplayergroup2.model.PlayList;
+import com.tranthanhdat.mucsicplayergroup2.model.Song;
 
 import java.util.ArrayList;
 
@@ -29,6 +30,7 @@ public class PlayListFragment extends Fragment {
     private RecyclerView rvPlaylists;
     private PlayListAdapter mPlaylistAdapter;
     private ArrayList<PlayList> mPlaylists;
+    private ArrayList<Song> mSongs;
     private DatabaseSqlite db;
 
     private BroadcastReceiver receiver=new BroadcastReceiver() {
@@ -75,7 +77,7 @@ public class PlayListFragment extends Fragment {
     private void loadRv(){
         this.mPlaylists=db.getAllPlaylist();
         //create song data
-        mPlaylistAdapter = new PlayListAdapter(super.getContext(),  mPlaylists);
+        mPlaylistAdapter = new PlayListAdapter(super.getContext(),  mPlaylists,this);
         rvPlaylists.setAdapter(mPlaylistAdapter);
 
         //RecyclerView scroll vertical
@@ -90,5 +92,21 @@ public class PlayListFragment extends Fragment {
         IntentFilter filter = new IntentFilter();
         filter.addAction(MainActivity.UPDATE_UI_PLAYLIST);
         getActivity().registerReceiver(receiver, filter);
+    }
+
+    public void showSongForPlayList(int idPlayList){
+        Intent intent = new Intent(getContext(),SongFoPlayListActivity.class);
+        Intent intentUpdateSongList=new Intent(MainActivity.UPDATE_LISTSONGS);
+        mSongs=db.getSongForPlayList(idPlayList);
+        intent.putExtra("PlayList",mSongs);
+        intentUpdateSongList.putExtra("idPlayList", idPlayList);
+        getActivity().startActivity(intent);
+        getActivity().sendBroadcast(intentUpdateSongList);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        getActivity().unregisterReceiver(receiver);
     }
 }

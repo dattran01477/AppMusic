@@ -1,6 +1,8 @@
 package com.tranthanhdat.mucsicplayergroup2.model;
 
-public class Song {
+import android.net.Uri;
+
+public class Song implements java.io.Serializable{
 
     private String mTitle;
     private String mLyric;
@@ -38,21 +40,23 @@ public class Song {
 
 
 
-    public Song(int id, String title, String artist) {
+    public Song(int id, String title, String artist,String mImageUrl) {
         this.id=id;
         this.mTitle=title;
         this.mArtist=artist;
+        this.mImageUrl=mImageUrl;
     }
 
     public Song(){
 
     }
 
-    public Song(String code, String title, String lyric, String artist) {
+    public Song(String code, String title, String lyric, String artist, String mImageUrl) {
 
         this.mTitle = title;
         this.mLyric = lyric;
         this.mArtist = artist;
+        this.mImageUrl=mImageUrl;
     }
 
 

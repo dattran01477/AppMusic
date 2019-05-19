@@ -12,6 +12,7 @@
         android:orientation="horizontal">
 
         <ImageView
+            android:id="@+id/image_album_notificaiton"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:src="@drawable/image_album"/>
@@ -65,20 +66,14 @@
                     android:layout_margin="5dp"
                     android:background="@drawable/ic_skipprev"/>
 
-                <Button
-                    android:id="@+id/btnPause"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:layout_margin="5dp"
-                    android:background="@drawable/ic_pause"/>
 
-                <Button
-                    android:id="@+id/btnPlay"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
+                <ImageButton
+                    android:id="@+id/btnPause"
+                    android:layout_width="80dp"
+                    android:layout_height="50dp"
                     android:layout_margin="5dp"
-                    android:background="@drawable/ic_play"
-                    android:visibility="gone"/>
+                    android:background="@android:color/transparent"
+                    />
 
                 <Button
                     android:id="@+id/btnNext"

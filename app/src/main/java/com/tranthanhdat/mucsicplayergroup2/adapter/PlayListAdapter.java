@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.tranthanhdat.mucsicplayergroup2.R;
 import com.tranthanhdat.mucsicplayergroup2.model.PlayList;
 import com.tranthanhdat.mucsicplayergroup2.model.Song;
+import com.tranthanhdat.mucsicplayergroup2.view.PlayListFragment;
 
 import java.util.List;
 
@@ -25,11 +26,13 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.Playli
     private List<PlayList> mPlaylists;
     private Context mContext;
     private LayoutInflater mLayoutInflater;
+    private PlayListFragment playListFragment;
 
-    public PlayListAdapter(Context context, List<PlayList> datas) {
+    public PlayListAdapter(Context context, List<PlayList> datas, PlayListFragment playListFragment) {
         mContext = context;
         mPlaylists = datas;
         mLayoutInflater = LayoutInflater.from(context);
+        this.playListFragment=playListFragment;
     }
 
     @Override
@@ -69,13 +72,10 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.Playli
             tvTitle = (TextView) itemView.findViewById(R.id.tv_name_playlist);
             tvNumberSong = (TextView) itemView.findViewById(R.id.tv_numbersong_playlist);
             rltLayout=(RelativeLayout) itemView.findViewById(R.id.card_row_playlist);
-            itemView.setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
+            itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onCreateContextMenu(ContextMenu contextMenu, View view, ContextMenu.ContextMenuInfo contextMenuInfo) {
-                    contextMenu.setHeaderTitle("Select The Action");
-                    contextMenu.add(0, view.getId(), 0, "Call");//groupId, itemId, order, title
-                    contextMenu.add(0, view.getId(), 0, "SMS");
-
+                public void onClick(View view) {
+                    playListFragment.showSongForPlayList(Integer.parseInt(rltLayout.getTag().toString()));
                 }
             });
         }
